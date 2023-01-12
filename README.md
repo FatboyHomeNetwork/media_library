@@ -42,7 +42,27 @@ Sharing the media library within the network will be implemented using standard 
 
 #### Windows Users
 
+Add an option *Import Media* to the **Send To** function in windows explorer. This option would add the network unc path for the item to the import queue. Once in the queue, the item would be imported imported in the library as part of the scheduled network import function. 
+
+How sedn to works. 
+
+Shortcuts can be created using python.
+
+
+
 will use Send To ... windows explore shell function. 
+
+shell:sendto 
+
+C:\Users\<user>\AppData\Roaming\Microsoft\Windows\SendTo
+
+list of short cuts. 
+
+
+How to auto create
+script? 
+change prop of exisitng one? 
+
 
 #### Torrent and Network Rip Services
 
