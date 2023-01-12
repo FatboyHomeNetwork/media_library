@@ -46,7 +46,7 @@ Add an option *Import Media* to the **Send To** function in windows explorer. Th
 
 **Sent to** is a windows explorer context menu function. When selected it presents a list of various *destinations* the item could be sent to. These destinations are short cuts that link to an executable able to take files and folders a command line options. 
 
-Using the **Sent to** function, users will be able to select any item that can access and chose to send it to the import queue. This kinda all implies something special needs to happen to actually support this. 
+Using the **Sent to** function, users will be able to select any item that can access - on their local or shared drives - and chose to send it to the import queue. 
 
 The implementation will be a python script and icons needed to create a new destination in the users send to function
 
