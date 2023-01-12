@@ -8,7 +8,7 @@ import logging
 import os 
 
 from import_queue import import_queue
-from  unc_path import  unc_path 
+from unc_path import  unc_path 
 
 class media_library_manager:
 
@@ -22,7 +22,7 @@ class media_library_manager:
         logging.basicConfig(filename=self.log_file_path, format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
 
     
-    def queue(self, path):
+    def queue_import(self, path):
         
         item_path = unc_path(path).as_unc()
         self.queue.add(item_path)

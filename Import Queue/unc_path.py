@@ -35,9 +35,10 @@ class unc_path(object):
         if self.__is_unc_path(): 
             return self.path 
         
-        try: # is a drive letter than can mapp to a unc share
-            return win32wnet.WNetGetUniversalName(self.path, 1)  
-            
-        except: # is not shared; access via admin share
+        try: # is a drive letter than can map to a unc share?
+            return win32wnet.WNetGetUniversalName(self.path, 1)  # yes
+        
+        # no, so ...
+        except: # we'll access via admin share
             return self.__as_admin_share()
         

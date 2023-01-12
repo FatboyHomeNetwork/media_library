@@ -40,7 +40,7 @@ class import_queue(object):
         lock.lock()
                         
         queue = self.__load_queue()
-        queue[item] = [datetime.datetime.now(), 0] # date when added, number of attempets to import 
+        queue[item] = [datetime.datetime.now(), 0] # date when added, number of attempts to import 
         self.__write_queue(queue)
         
         lock.unlock()
