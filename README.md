@@ -80,7 +80,8 @@ The media library is a windows drive. As a windows drive it can be shared in dif
 
 Where ever possible the design will be to automate the install and config of different ways the library will be shared.
 
-2. SMB 1.0
+1. NFS
+2. SMB/CIFS
 3. HomeShare
 
 #### HomeShare what and why? 
