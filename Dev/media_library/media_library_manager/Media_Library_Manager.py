@@ -27,7 +27,7 @@ class media_library_manager:
         logging.debug('Queued: %s.' % item_path)
     
     
-    def next(self):
+    def import_next(self):
         
         try:
             item = self.queue.next()
