@@ -9,7 +9,7 @@ import sys
 import os
 import shutil
 import distutils.dir_util
-import media_library
+import import
 
 def dst_path(path, media_item_name):
 
