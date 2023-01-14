@@ -11,7 +11,7 @@ import stat
 
 class media_preparator(object):
     
-    def __init__(self):
+    #def __init__(self):
     #
     # Prepare path
     #
@@ -80,4 +80,5 @@ class media_preparator(object):
             self.__strip_unicode(path)
             self.__ensure_path_len(path)
             self.__ensure_is_directory(path)
-            
+        
+        return path        

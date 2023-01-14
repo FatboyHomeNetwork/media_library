@@ -9,49 +9,40 @@ import magic
 import ffmpy
 import operator
 
-from enum import Enum    
+import media_library as ml
 
-class media_converter:
+
+class converter:
 
     #
-    # Mime type identificaiton
+    # Mime type id
     #
-    
-    class Mime_Type(Enum):
-        IMAGE = 1
-        VIDEO = 2
-        AUDIO = 3
-        TEXT = 4
-        
-        NOT_SUPPORTED = 99
             
     def __get_mime_type(path):
         
         TYPE = 0
         SUBTYPE = 1
+
+        mime_type = magic.from_file(path, mime=True).split('/')
         
-        if os.path.isfile(path):
-            mime_type = magic.from_file(path, mime=True).split('/')
-            
-            if mime_type[TYPE] == 'image': 
-                return media_converter.Mime_Type.IMAGE
-            
-            elif mime_type[TYPE] == 'video':
-                return media_converter.Mime_Type.VIDEO
-            
-            elif mime_type[TYPE] == 'audio':
-                return media_converter.Mime_Type.AUDIO
-            
-            elif mime_type[TYPE] == 'application' and mime_type[SUBTYPE]  == 'octet-stream': ## TODO: also include extensions
-                return media_converter.Mime_Type.AUDIO
-            
-            elif mime_type[TYPE] == 'text':
-                return media_converter.Mime_Type.TEXT
-            
-            else:
-                return media_converter.Mime_Type.NOT_SUPPORTED
+        if mime_type[TYPE] == 'image': 
+            return ml.mime_type.IMAGE
+        
+        elif mime_type[TYPE] == 'video':
+            return ml.mime_type.VIDEO
+        
+        elif mime_type[TYPE] == 'audio':
+            return ml.mime_type.AUDIO
+        
+        elif mime_type[TYPE] == 'application' and mime_type[SUBTYPE]  == 'octet-stream': ## TODO: also include extensions
+            return ml.mime_type.AUDIO
+        
+        elif mime_type[TYPE] == 'text':
+            return ml.mime_type.TEXT
+        
         else:
-            return media_converter.Mime_Type.NOT_SUPPORTED
+            return ml.mime_type.NOT_SUPPORTED
+
 
     def __add_to(mime_type_sizes, tag, value):
         
@@ -62,6 +53,7 @@ class media_converter:
 
         return mime_type_sizes
     
+    
     def __get_top_tag(mime_type_sizes):
                 
         mime_type_sizes_sorted = sorted(mime_type_sizes.items(), key=operator.itemgetter(1))
@@ -71,7 +63,8 @@ class media_converter:
         else:
             return None
  
-    def likely_mime_type(path):
+ 
+    def mime_type(path):
         mime_type_sizes = {}
         
         if os.path.isdir(path):
@@ -79,13 +72,13 @@ class media_converter:
                 
                 for file in files:
                     file_path = os.path.join(subdir,file)
-                    mime_type = media_converter.__get_mime_type(file_path)
-                    mime_type_sizes = media_converter.__add_to(mime_type_sizes, mime_type, os.path.getsize(file_path))
+                    mime_type = converter.__get_mime_type(file_path)
+                    mime_type_sizes = converter.__add_to(mime_type_sizes, mime_type, os.path.getsize(file_path))
             
-            return media_converter.__get_top_tag(mime_type_sizes)
+            return converter.__get_top_tag(mime_type_sizes)
         
         else:
-            return media_converter.__get_mime_type(path)
+            return converter.__get_mime_type(path)
 
     #
     # Media Conversion Functions
@@ -93,13 +86,13 @@ class media_converter:
     
     def __get_destination_path(mime_type, path):
 
-        if mime_type == media_converter.Mime_Type.IMAGE: 
+        if mime_type == ml.mime_type.IMAGE: 
             return os.path.splitext(path)[0] + '.jpg'
         
-        elif mime_type == media_converter.Mime_Type.VIDEO:
+        elif mime_type == ml.mime_type.VIDEO:
             return os.path.splitext(path)[0] + '.mp4'
         
-        elif mime_type == media_converter.Mime_Type.AUDIO:
+        elif mime_type == ml.mime_type.AUDIO:
             return os.path.splitext(path)[0] + '.mp3'
         
         else:
@@ -113,11 +106,11 @@ class media_converter:
             for file in files:
                                 
                 src = os.path.join(subdir, file)
-                type = media_converter.__get_mime_type(src)
+                type = converter.__get_mime_type(src)
                 
-                if type != media_converter.Mime_Type.NOT_SUPPORTED:  
+                if type != converter.Mime_Type.NOT_SUPPORTED:  
                     
-                    destination_path = media_converter.__get_destination_path(type, src)
+                    destination_path = converter.__get_destination_path(type, src)
                     if destination_path.lower() != src.lower():
                         ff = ffmpy.FFmpeg(executable=FFMPEG_PATH, inputs={src: None}, outputs={destination_path: '-y'})
                         ff.run()
