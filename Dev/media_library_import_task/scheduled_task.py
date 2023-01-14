@@ -7,7 +7,7 @@ from media_library.media_library_manager import media_library_manage as mgn
 
 if __name__ == "__main__":
     
-    if len(sys.argv) == 2: # import_task.py "<media_library_path>"
+    if len(sys.argv) == 2: # scheduled_task.py "<media_library_path>"
         
         mlp = sys.argv[1]
         logging.basicConfig(filename=ml.log_file(mlp), format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
@@ -17,5 +17,5 @@ if __name__ == "__main__":
             mgn.import_next()
         
         else:    
-            logging.critical('Import task: media library not found. %s.' % mlp)
+            logging.critical('Scheduled task: media library not found. %s.' % mlp)
         
