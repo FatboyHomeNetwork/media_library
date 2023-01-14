@@ -1,14 +1,89 @@
+    
+import os
+import json
+import datetime
+import time
+import random
+import win32wnet
+import platform
+
+################################################################################################
+#
+#  File lock
+#
+################################################################################################
+
+class file_lock(object):
+
+    def __init__(self, file):
+        self.lock_path = file + '.lock'
+
+    def __wait (self):
+        return random.randint(1, 5) # between 1 and 5 seconds
+
+    def lock (self):
+        blocked = True
+        while (blocked):
+            try:
+                open(self.lock_path,'x')
+                blocked = False
+            except FileExistsError: 
+                time.sleep(self.__wait())
+
+    def unlock(self):
+        blocked = True
+        while (blocked):
+            try:
+                os.remove(self.lock_path)
+                blocked = False
+            except FileNotFoundError:
+                blocked = False
+
+################################################################################################
+#
+#  unc path
+#
+################################################################################################
+
+class unc_path(object):
+    
+    def __init__(self, path):
+        
+        self.path = path
+    
+    def __is_unc_path(self):
+        # see: file_path_fomats_on_windows_systems.pdf
+        
+        if len(self.path) > 3 and self.path[0:2] == '\\\\' and self.path[2:3] != '?' and self.path[2:3] != '.':
+            return True 
+        else:
+            return False
+
+
+    def __as_admin_share(self):
+         # C:\Dir\subDir\etc. -> \\<machine name>\C$\Dir\subDir\etc. 
+         
+        return  '\\\\' +  platform.node() + '\\' + self.path.replace(':','$',1)
+    
+    
+    def as_unc(self):
+        
+        if self.__is_unc_path(): 
+            return self.path # come as you are 
+        
+        try: # is a drive letter that has been mapped to a unc share?
+            return win32wnet.WNetGetUniversalName(self.path, 1)  # yes
+        
+        # no, so ...
+        except: # we'll access via admin share
+            return self.__as_admin_share()
+        
+
 ################################################################################################
 #
 #  import_queue
 #
 ################################################################################################
-    
-import os
-import json
-import datetime
-
-from file_lock import file_lock
 
 MAX_ATTEMPTS = 2 
 

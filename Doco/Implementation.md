@@ -1,24 +1,29 @@
 # Media Library - Implementation 
 
-## Importing in to the media library 
+## Manager Library Manager
 
-Manager Library Manager
+
+## Import 
+
 Queue 
 Importer (converting & normalization)
-Send to ... - admin sharing & user account need to exist. script/wrapper
 
-## Media Converting
-
-Media Preparator - encoding,length, dir structures  
-Media Converter - convert to network stds
-
-## Name Normalization    
+## Item Name Normalization    
 
 Encoder 
 - doco on how the approach works 
 - doco on the standard file name. need to include new news approach on abc, sbs
 
-## Share as various services 
+## Media Converting
+
+Media Preparator - encoding,length, dir structures  
+Media Converter - convert to network standard
+
+## Send to ... 
+
+- admin sharing & user account need to exist. script/wrapper
+
+## Media Library Network Shares
 
 The configurations needed to turn on the services and set the security
 
