@@ -2,7 +2,7 @@ import logging
 import os 
 import sys 
 
-import media_library as ml
+import media_library.media_library_manager.media_library as ml
 
 from media_library.Import_item import queue
 from media_library.Import_item import importer 
