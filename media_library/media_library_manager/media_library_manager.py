@@ -5,7 +5,7 @@ import sys
 from enum import Enum    
 
 #import Import_item.import_queue
-from media_library.Import_item import importer 
+from media_library.media_library.import_item import importer 
 
 class mime_type(Enum):
     IMAGE = 1
