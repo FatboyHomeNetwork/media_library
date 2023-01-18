@@ -1,9 +1,9 @@
-from import_queue_manager import import_queue_manager
 
+import media_library_manager as mlm
 
 if __name__ == "__main__":
     
-    IMPORT_QUEUE_PATH = '\\\\SERVER\\Users\\Paul\\Documents\\Projects\\Fat Boy Home Network (FBHN)\\01 Media Library\\50 TestEnvironment\\media_library'
+    MEDIA_LIBRARY = '\\\\SERVER\\Users\Paul\\Documents\\GitHub\\media_library\\test\\media_library'
     
     # An existing share
     #PATH = '\\\\SERVER\\Users\\Paul\\Documents\\Projects\\Fat Boy Home Network (FBHN)\\01 Media Library\\50 TestEnvironment\\_test_data\\five'
@@ -14,5 +14,5 @@ if __name__ == "__main__":
     # A local drive mapped to an admin share unc path 
     PATH = "C:\\intel"
     
-    import_queue_manager = import_queue_manager(IMPORT_QUEUE_PATH)
-    import_queue_manager.add(PATH)
+    mlm = media_library_manager(IMPORT_QUEUE_PATH)
+    mlm.queue(PATH)
