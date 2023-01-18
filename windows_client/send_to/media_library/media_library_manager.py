@@ -7,8 +7,8 @@ import platform
 
 from enum import Enum    
 
-import queue.import_queue as queue
-import importer.importer as importer
+import media_library.import_queue.import_queue as queue
+import media_library.importer.importer as importer
 
 class mime_type(Enum):
     IMAGE = 1
@@ -57,7 +57,7 @@ class media_library_manager:
     def __init__(self, library_path):
         
         self.library_path = library_path
-        self.queue = queue(self.queue_file(library_path))
+        self.queue = queue(self.import_queue_file(library_path))
         
         logging.basicConfig(filename=self.log_file(library_path), format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
 
@@ -68,10 +68,10 @@ class media_library_manager:
     def log_file(self):
         return os.path.join(self.library_path, 'system', 'media_library.log')
 
-    def tmp_path(self):
+    def temp_path(self):
         return os.path.join(self.library_path, 'system','temp')
 
-    def queue_file(self):
+    def import_queue_file(self):
         return os.path.join(self.library_path, 'system','import.queue')
 
     def media_path(self):
