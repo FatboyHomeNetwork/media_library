@@ -49,7 +49,7 @@ class media_library_manager:
             logging.info('Start Import: %s.' % item)
 
             if os.path.exists(item):
-                importer.import_item(item)
+                ml.import_item(item)
                 self.queue.remove(item)    
                 logging.info('Complete Import: %s.' % item)
             else:
