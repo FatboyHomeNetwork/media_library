@@ -4,8 +4,7 @@ import sys
 
 from enum import Enum    
 
-#import Import_item.import_queue
-from media_library.media_library.import_item import importer 
+import  media_library.import_item as ml
 
 class mime_type(Enum):
     IMAGE = 1
@@ -20,7 +19,7 @@ class media_library_manager:
     def __init__(self, library_path):
         
         self.library_path = library_path
-        self.queue = Import_item.import_queue.import_queue(self.queue_file(library_path))
+        self.queue = ml.import_queue(self.queue_file(library_path))
         
         logging.basicConfig(filename=self.log_file(library_path), format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
 
