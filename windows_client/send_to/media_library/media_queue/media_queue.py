@@ -21,6 +21,7 @@ class file_lock(object):
             except FileExistsError: 
                 time.sleep(self.__wait())
 
+
     def unlock(self):
         blocked = True
         while (blocked):
@@ -29,6 +30,8 @@ class file_lock(object):
                 blocked = False
             except FileNotFoundError:
                 blocked = False
+            except:
+                time.sleep(self.__wait())
         
 
 MAX_ATTEMPTS = 10  

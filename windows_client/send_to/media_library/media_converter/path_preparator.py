@@ -9,7 +9,7 @@ import unicodedata
 import shutil
 import stat 
 
-class media_preparator(object):
+class path_preparator(object):
     
     #def __init__(self):
     #

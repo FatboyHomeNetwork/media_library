@@ -12,7 +12,7 @@ import operator
 import media_library as ml
 
 
-class converter:
+class media_converter:
 
     #
     # Mime type id

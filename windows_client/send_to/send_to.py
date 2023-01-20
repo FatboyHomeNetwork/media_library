@@ -1,23 +1,17 @@
 import sys
 import os
-import logging
 
-import media_library.media_library_manager as mlm  
+from  media_library.media_library_manager import media_library_manager as library_manager
 
 if __name__ == "__main__":
     
-    if len(sys.argv) == 2: # send_to.py "<item_path>" 
+    #if len(sys.argv) == 2: # send_to.py "<item_path>" 
                         
-        item = sys.argv[1]
+        #item = sys.argv[1] 
+        item = '\\\\SERVER\\Users\\Paul\\Documents\\GitHub\\media_library\\test\\_test_data\\five\media.mkv'
         media_library_path = str(os.getenv('MEDIA_LIBRARY'))
         
-        logging.basicConfig(filename=__file__+'.error.log', format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
-        
         if os.path.exists(media_library_path):
-            lib_mgn = mlm(media_library_path)
-            lib_mgn.queue(item)
-        
+            library_manager(media_library_path).queue_media(item)
         else:    
-            logging.critical('Send To: media library not found. MEDIA_LIBRARY=%s.' % media_library_path)
-        
-    
+            raise Exception('Media library not found. MEDIA_LIBRARY=%s.' % media_library_path)
