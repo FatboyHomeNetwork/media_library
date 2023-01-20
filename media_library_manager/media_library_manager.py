@@ -19,7 +19,7 @@ class media_library_manager:
     def __init__(self, library_path):
         
         self.library_path = library_path
-        self.queue = ml.import_queue(self.queue_file(library_path))
+        self.queue = ml.media_queue(self.queue_file(library_path))
         
         logging.basicConfig(filename=self.log_file(library_path), format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
 

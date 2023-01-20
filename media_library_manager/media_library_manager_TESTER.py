@@ -14,5 +14,5 @@ if __name__ == "__main__":
     # A local drive mapped to an admin share unc path 
     PATH = "C:\\intel"
     
-    mlm = media_library_manager(IMPORT_QUEUE_PATH)
+    mlm = media_library_manager(media_queue_PATH)
     mlm.queue(PATH)

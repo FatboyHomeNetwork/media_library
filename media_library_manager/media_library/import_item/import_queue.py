@@ -83,13 +83,13 @@ class unc_path(object):
 
 ################################################################################################
 #
-#  import_queue
+#  media_queue
 #
 ################################################################################################
 
 MAX_ATTEMPTS = 2 
 
-class import_queue(object):
+class media_queue(object):
 
     def __init__(self, path):
         

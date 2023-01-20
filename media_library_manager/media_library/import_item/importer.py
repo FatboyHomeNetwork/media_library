@@ -12,7 +12,7 @@ import distutils.dir_util
 import media_library as ml
 
 
-from  media_library.Import_item import import_queue as queue
+from  media_library.Import_item import media_queue as queue
 from  media_library.media_converter import path_preparator as preparator
 from  media_library.media_converter import converter as media_converter
 

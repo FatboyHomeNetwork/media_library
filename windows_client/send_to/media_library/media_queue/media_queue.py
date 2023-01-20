@@ -33,7 +33,7 @@ class file_lock(object):
 
 MAX_ATTEMPTS = 10  
 
-class import_queue(object):
+class media_queue(object):
 
     def __init__(self, path):
         self.queue_file_path = path
@@ -77,6 +77,7 @@ class import_queue(object):
                 queue[k] = v
                 item = k
                 break
+            #elif v[1] == MAX_ATTEMPTS write to log if an item has been i the queue for too long? 
         
         self.__write_queue(queue)
         

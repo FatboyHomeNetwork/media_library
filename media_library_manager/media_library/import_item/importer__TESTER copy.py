@@ -1,8 +1,8 @@
 
-from import_queue import import_queue 
+from media_queue import media_queue 
 
 if __name__ == "__main__":
-    queue = import_queue('\\\\SERVER\\Users\\Paul\\Documents\\Projects\\Fat Boy Home Network (FBHN)\\01 Media Library\\50 TestEnvironment\\media_library')
+    queue = media_queue('\\\\SERVER\\Users\\Paul\\Documents\\Projects\\Fat Boy Home Network (FBHN)\\01 Media Library\\50 TestEnvironment\\media_library')
     
     i = queue.next()
     print(i)
