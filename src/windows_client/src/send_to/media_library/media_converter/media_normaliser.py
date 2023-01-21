@@ -7,10 +7,11 @@
 #
 ################################################################################################
 
-
 import os
 
-from media_library.media_converter import decoder
+import media_library.media_converter.decoder as dc
+from media_library.media_converter.decoder import decoder 
+
 #
 # abstract media item common class 
 #
@@ -605,6 +606,8 @@ class normalizer():
             return False
    
 ################################################################################################
+#
+# Entry point 
 #
 ################################################################################################
     

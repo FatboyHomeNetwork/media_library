@@ -12,7 +12,7 @@ from media_library.media_queue import media_queue
 from media_library.media_converter.path_preparator import path_preparator 
 from media_library.media_converter.media_converter import media_converter
 
-import media_library.media_converter as normaliser
+import media_library.media_converter.media_normaliser as normaliser
 
 
 def log_file(media_library):
@@ -55,7 +55,7 @@ class media_path:
             return win32wnet.WNetGetUniversalName(self.path, 1)  # yes
         
         # no, so ...
-        except: # is local, so access via admin share
+        except: # is a local path, so access via admin share
             return self.__as_admin_share()
 
 
@@ -82,6 +82,8 @@ class media_library_manager:
      
     def import_next_media(self):
         item = None
+        item_temp_path = None
+        media_library_path = None
         
         try:
             item = self.queue.next()
@@ -94,11 +96,11 @@ class media_library_manager:
                 item_temp_path = os.path.join(temp_path(self.library_path), item_name)
                 
                 # copy to temp
-                #if os.path.isdir(item):
-                #    copy_tree(item, item_temp_path)
-                #else:
-                #    os.makedirs(item_temp_path, exist_ok=True)
-                #    copy_file(item, item_temp_path)
+                if os.path.isdir(item):
+                    copy_tree(item, item_temp_path)
+                else:
+                    os.makedirs(item_temp_path, exist_ok=True)
+                    copy_file(item, item_temp_path)
                 
                 # convert etc in temp
                 ## TODO item_temp_path = path_preparator().prepare(item_temp_path)
@@ -118,7 +120,7 @@ class media_library_manager:
                 
             else:
                 logging.warning('Import path not found: %s.' % item)
-        
+            
         except:
             logging.exception('****')
             logging.exception('Source Item: %s.' % item)
