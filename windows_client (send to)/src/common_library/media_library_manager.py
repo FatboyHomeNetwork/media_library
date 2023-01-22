@@ -8,11 +8,11 @@ import shutil
 from shutil import copy2 as copy_file
 from  distutils.dir_util import copy_tree, remove_tree
 
-from media_library.media_queue import media_queue 
-from media_library.media_converter.path_preparator import path_preparator 
-from media_library.media_converter.media_converter import media_converter
+from common_library.media_queue import media_queue 
+from common_library.media_converter.path_preparator import path_preparator 
+from common_library.media_converter.media_converter import media_converter
 
-import media_library.media_converter.media_normaliser as normaliser
+import common_library.media_converter.media_normaliser as normaliser
 
 
 def log_file(media_library):
