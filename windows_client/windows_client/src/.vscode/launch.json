@@ -10,6 +10,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
+            "module": "packagex.script_file",
             "args": ["\\\\SERVER\\Users\\Paul\\Documents\\GitHub\\media_library\\test_env\\_test_data\\five\\media.mkv"]
         }
     ]
