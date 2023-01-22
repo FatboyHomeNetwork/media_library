@@ -8,11 +8,11 @@ import shutil
 from shutil import copy2 as copy_file
 from  distutils.dir_util import copy_tree, remove_tree
 
-from media_library.media_queue import media_queue 
-from media_library.media_converter.path_preparator import path_preparator 
-from media_library.media_converter.media_converter import media_converter
+from media_library.common_library.media_queue import media_queue 
+from media_library.common_library.media_converter.path_preparator import path_preparator 
+from media_library.common_library.media_converter.media_converter import media_converter
 
-import media_library.media_converter.media_normaliser as normaliser
+import media_library.common_library.media_converter.media_normaliser as normaliser
 
 
 def log_file(media_library):
@@ -76,7 +76,8 @@ class media_library_manager:
             logging.info('Queued: %s.' % unc_path)
         
         except:
-            logging.exception('Item: %s.' % item)
+            logging.exception('****')
+            logging.exception('Source Item: %s.' % item)
             logging.exception(str(sys.exc_info()))    
      
      
@@ -128,6 +129,13 @@ class media_library_manager:
             logging.exception('Library Path: %s.' % media_library_path)
             logging.exception(str(sys.exc_info()))    
     
+    
     def remove_media(self, item):
         
-        logging.info('Removed from client: %s.' % item)
+        try:
+            logging.info('Queued: %s.' % item)
+        except:
+            logging.exception('****')
+            logging.exception('Source Item: %s.' % item)
+            logging.exception(str(sys.exc_info()))    
+        

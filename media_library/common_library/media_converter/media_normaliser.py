@@ -9,8 +9,8 @@
 
 import os
 
-import media_library.media_converter.decoder as dc
-from media_library.media_converter.decoder import decoder 
+import common_library.media_converter.decoder as dc
+from common_library.media_converter.decoder import decoder 
 
 #
 # abstract media item common class 
