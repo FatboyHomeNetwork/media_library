@@ -8,3 +8,4 @@
         "wnet"
     ]
 }
+"python.envFile": "${workspaceFolder}/development.env",
