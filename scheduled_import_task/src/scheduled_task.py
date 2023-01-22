@@ -1,21 +1,15 @@
 import sys
 import os
-import logging
 
-import media_library as ml
-from media_library.media_library_manager import media_library_manage as mgn
+from media_library.media_library_manager import media_library_manager 
 
 if __name__ == "__main__":
     
-    if len(sys.argv) == 2: # scheduled_task.py "<media_library_path>"
-        
-        mlp = sys.argv[1]
-        logging.basicConfig(filename=ml.log_file(mlp), format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
-        
-        if os.path.exists(mlp):
-            mgn = mgn(mlp)
-            mgn.import_next()
-        
-        else:    
-            logging.critical('Scheduled task: media library not found. %s.' % mlp)
-        
+    media_library_path = str(os.getenv('MEDIA_LIBRARY'))
+    
+    if os.path.exists(media_library_path):
+        media_library_manager (media_library_path).import_next_media()
+    else:    
+        raise Exception('Media library not found. MEDIA_LIBRARY=%s.' % media_library_path)
+    
+    

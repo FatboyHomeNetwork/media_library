@@ -1,6 +1,0 @@
-[project]
-name = "media_library"
-version = "0.0.1"
-dependencies = [
-    "requests"
-]

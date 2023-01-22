@@ -9,8 +9,8 @@
 
 import os
 
-import common_library.media_converter.decoder as dc
-from common_library.media_converter.decoder import decoder 
+import  media_library.common_library.media_converter.decoder as dc
+from media_library.common_library.media_converter.decoder import decoder 
 
 #
 # abstract media item common class 
@@ -615,13 +615,14 @@ def normalize_path(path):
     
     norm = normalizer(path)
     
+    media_item_path = None
+    
     if norm.is_series():
         media_item = series(path)
         media_item.normalise()
         media_item_path = media_item.cal_normalised_path
-        
     else: 
-        print('is_movie()')
+        print('!is_series()')
     
     return media_item_path
     
