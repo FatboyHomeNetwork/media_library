@@ -13,7 +13,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["\\\\SERVER\\Users\\Paul\\Documents\\GitHub\\media_library_repo\\test_env\\_test_data\\five"],
+            "args": ["\\\\SERVER\\Users\\Paul\\Documents\\GitHub\\media_library_repo\\test_env\\_test_data","five"],
             "justMyCode": true
             
         }
