@@ -110,7 +110,7 @@ class media_library_manager:
                 # normalise the path names
                 item_temp_path = normaliser.normalize_path(item_temp_path)
                                 
-                # copy from temp to media library; del from temp
+                # copy from temp to media library; del temp
                 item_name, ext = os.path.splitext(os.path.basename(item_temp_path))
                 media_library_path = os.path.join(media_library_media_path(self.library_path), item_name)
                 copy_tree(item_temp_path, media_library_path)
