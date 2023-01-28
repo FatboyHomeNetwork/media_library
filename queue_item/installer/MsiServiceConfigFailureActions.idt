@@ -1,3 +1,0 @@
-MsiServiceConfigFailureActions	Name	Event	ResetPeriod	RebootMessage	Command	Actions	DelayActions	Component_
-s72	l255	i2	I4	L255	L255	S0	S0	s72
-MsiServiceConfigFailureActions	MsiServiceConfigFailureActions
