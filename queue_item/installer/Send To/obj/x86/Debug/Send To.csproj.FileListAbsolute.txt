@@ -1,0 +1,10 @@
+G:\media_library__project\queue_item\installer\Send To\bin\Debug\Send To.dll
+G:\media_library__project\queue_item\installer\Send To\bin\Debug\Send To.CA.dll
+G:\media_library__project\queue_item\installer\Send To\bin\Debug\Send To.pdb
+G:\media_library__project\queue_item\installer\Send To\bin\Debug\Microsoft.Deployment.WindowsInstaller.dll
+G:\media_library__project\queue_item\installer\Send To\bin\Debug\Microsoft.Deployment.WindowsInstaller.xml
+G:\media_library__project\queue_item\installer\Send To\obj\x86\Debug\Send To.csproj.AssemblyReference.cache
+G:\media_library__project\queue_item\installer\Send To\obj\x86\Debug\Send To.csproj.CoreCompileInputs.cache
+G:\media_library__project\queue_item\installer\Send To\obj\x86\Debug\Send To.csproj.CopyComplete
+G:\media_library__project\queue_item\installer\Send To\obj\x86\Debug\Send To.dll
+G:\media_library__project\queue_item\installer\Send To\obj\x86\Debug\Send To.pdb
