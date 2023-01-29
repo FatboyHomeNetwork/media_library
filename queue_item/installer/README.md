@@ -38,8 +38,8 @@ This uses Send To as an example for what a very simple *.msi looks like.
 
 | File | Description | path to source | path to target |
 |---|---|---|---|
-|queue_item.exe|where the action is at!| [SourceDir]\installer\Program Files\Queue Item | [ProgramFilesFolder]\Queue Item\queue_item.exe|
-|Media Library.lnk | send to short cut | [SourceDir]\installer\send to\Media Library.lnk | [SendTo]\Media Library.lnk |
+|queue_item.exe|where the action is at!| [SourceDir]\installer\Program Files\Queue Item | [ProgramFilesFolder]\Media Library\send_to_media_library.exe|
+
 
 
 ### Registry Updates 
