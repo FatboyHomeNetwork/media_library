@@ -27,6 +27,25 @@ Features atomic. are what a user add or remove within an app.
 +database
 +cab and other files
 
+
+**`*.cab files`**
+
+Part of the instal is to install the 'queue_item.exe' app in the programs the directory and to copy a short cut to a know location. Both those files need to be zipped up ina '*.cab' file.  
+
+1. *.cab
+
+Use `makecab`  - std windows tool- to make a cab file forma file, directory
+
+2. add *.cab to *.msi
+
+Use Msidb.exe to add the cabinet file Mycab.cab msi
+
+`Msidb.exe -d mydatabase.msi -a mycab.cab.` 
+
+3. add to config table
+
+In  Media tables should contain the string: `#mycab.cab.`
+
 ### Installer Actions & Properties (aka the template pattern)
 
 
@@ -34,13 +53,14 @@ Features atomic. are what a user add or remove within an app.
 
 This uses Send To as an example for what a very simple *.msi looks like. 
 
-### Directory files 
+### files & directory Structures
 
 | File | Description | path to source | path to target |
 |---|---|---|---|
 |queue_item.exe|where the action is at!| [SourceDir]\installer\Program Files\Queue Item | [ProgramFilesFolder]\Media Library\send_to_media_library.exe|
-
-
+|python3.exe|python run time | [SourceDir]\installer\Program Files\Queue Item | [ProgramFilesFolder]\Media Library\send_to_media_library.exe|
+|python3.exe|python run time | [SourceDir]\installer\Program Files\Queue Item | [ProgramFilesFolder]\Media Library\send_to_media_library.exe|
+|.\lib |python libs to support. can be huge! | [SourceDir]\installer\Program Files\Queue Item | [ProgramFilesFolder]\Media Library\send_to_media_library.exe|
 
 ### Registry Updates 
 
@@ -56,13 +76,33 @@ This uses Send To as an example for what a very simple *.msi looks like.
 
 Shortcut are installed as resources associated  with 
 
-### Components
+### Users 
 
-| Component | Resource |
-|---| ---|
-|SendTo| send_to_lnk, queue_item.exe |
+To support admin share access a `media_library` account is created. this is an admin account used when accessing media on the client computer 
 
+**TODO**. ideally this account requires the same p/w across both server and client.
 
+## Development Environment Tools
 
+DYI environment. big set of tools. **TODO** check out the make file to see what a basic tool change for building an msi file would look like 
 
+| Tool | Description | 
+| ---  | --- |
+|Instmsi.exe|Redistributable package for installing the Windows Installer on Windows operating systems earlier than Windows Me. |
+|Msicert.exe|Populates the MsiDigitalSignature table and MsiDigitalCertificate table with the digital signature information belonging to external cabinet files in the Media table. |
+|Msidb.exe|Imports and exports database tables and streams, merges databases, and applies transforms. |
+|Msifiler.exe|Populates the File table with file versions, languages, and sizes based upon a source directory. It can also update the MsiFileHash table with file hashes. |
+|Msiinfo.exe|Edits or displays summary information stream. |
+|Msimerg.exe|Merges one database into another. |
+|Msimsp.exe	|Patch creation tool. The recommended method for generating a patch package is to use a patch creation tool such as Msimsp.exe with PATCHWIZ.DLL. |
+|Msistuff.exe|Displays or configures the resources in the Setup.exe bootstrap executable. |
+|Msitool.mak |Makefile that can be used to make tools and custom actions. |
+|Msitran.exe |Generates a transform or applies a transform file to a database. |
+|Msival2.exe |Runs one or a suite of Internal Consistency Evaluators - ICEs.|
+|Msizap.exe |Removes Windows Installer information for a product or all products installed on a machine. |
+|Orca.exe	|Database editor. Creates and edits .msi files and merge modules. |
+|PATCHWIZ.DLL|Generates a Windows Installer patch package from a patch creation properties file (.pcp file). The recommended method for generating a patch package is to use a patch creation tool such as Msimsp.exe with PATCHWIZ.DLL. |
+|Wilogutl.exe|Assists the analysis of log files from a Windows Installer installation and displays suggested solutions to errors. |
+
+Above list taken from (https://learn.microsoft.com/en-us/windows/win32/msi/windows-installer-development-tools). These tools are available in the windows 10 SDK. 
 
