@@ -1,4 +1,1 @@
-REM Basic install
-
-msiexec /i test.msi /l* test.log
-
+msiexec /i src\test.msi /l* test.log
