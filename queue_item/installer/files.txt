@@ -1,3 +1,0 @@
-g:\media_library__project\queue_item\bin\python3.dll
-g:\media_library__project\queue_item\bin\python39.dll
-g:\media_library__project\queue_item\bin\queue_item.exe
