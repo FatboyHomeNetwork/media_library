@@ -1,1 +1,1 @@
-"C:\Program Files (x86)\Orca\Orca.exe" test.msi
+"C:\Program Files (x86)\Orca\Orca.exe" .\src\test.msi

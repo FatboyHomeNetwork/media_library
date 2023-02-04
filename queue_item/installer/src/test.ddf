@@ -1,0 +1,16 @@
+
+
+.OPTION EXPLICIT                     
+
+.set DiskDirectoryTemplate=src ; destination dir for the cab file
+.Set CabinetNameTemplate=test.cab ; the cab file  name 
+.Set MaxDiskSize=CDROM ; ensure one cab file
+
+.Set Cabinet=on
+.Set Compress=on
+
+; explicit list of files to import into the *.cab file 
+".\PROGRAMFILES\Fatboy Media Library\queue_item.exe"
+".\PROGRAMFILES\Fatboy Media Library\bin\python3.dll"
+".\PROGRAMFILES\Fatboy Media Library\bin\python39.dll"
+
