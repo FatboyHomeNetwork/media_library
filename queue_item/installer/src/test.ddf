@@ -11,6 +11,6 @@
 ; explicit list of files to import into the *.cab file 
 
 ".\PROGRAMFILES\Fatboy Media Library\queue_item.exe"
-".\PROGRAMFILES\Fatboy Media Library\bin\python3.dll"
-".\PROGRAMFILES\Fatboy Media Library\bin\python39.dll"
+;".\PROGRAMFILES\Fatboy Media Library\bin\python3.dll"
+;".\PROGRAMFILES\Fatboy Media Library\bin\python39.dll"
 
