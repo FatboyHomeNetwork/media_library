@@ -1,5 +1,0 @@
-_library_data simulates data being held in an app controlled dir, like itunes 
-
-_tmp simulates the a tempory location where converter would work on the media item. This place is not the torrent dir or the file media_library directory 
-
-media_library is the top level directory for the media library 
