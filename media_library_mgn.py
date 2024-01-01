@@ -1,44 +1,33 @@
 ################################################################################################
 #
-#  media_library_manager - proxy pattern 
+#  media_library
 #
 ################################################################################################
 
 import logging
 import os 
 
-from import_queue import import_queue
-from  unc_path import  unc_path 
+from media_queue.media_queue import queue as queue 
+from media_path_normaliser.media_path import media_path
+from media_path_normaliser.library_directories import library_directories
 
-class media_library_manager:
+LOG_FILE_NAME = 'media_library.log'
 
+class media_library_mgn:
     
-    working_dir = "ddd"
-    library_dir = "qqq"
-    log_dir = "qqq"
-    
-    ## Media
-    ## Music
-    ## Pictures
-       
-    
-    
-    def __init__(self, library_path, working_path):
+    PATHS = None
         
-        self.library_path = library_path
-        self.working_path = working_path
-        self.queue = import_queue(self.library_path)
-        self.log_file_path = os.path.join(self.library_path, 'media_library.log')
+    def __init__(self, path):
         
-        logging.basicConfig(filename=self.log_file_path, format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
-
+        PATHS = library_directories(path)
+        self.queue = queue(PATHS.LIBRARY)
+        logging.basicConfig(filename=os.path.join(self.LOG_FILE_PATH, LOG_FILE_NAME), format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
     
     def queue(self, path):
         
-        item_path = unc_path(path).as_unc()
-        self.queue.add(item_path)
-        logging.debug('Queued: %s.' % item_path)
-
+        item = media_path(path).adminshare()
+        self.queue.add(item)
+        logging.debug('Queued: %s.' % item)
     
     def import_next(self):
     

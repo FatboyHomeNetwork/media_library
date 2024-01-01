@@ -80,3 +80,5 @@ class path_preparator(object):
             path = self.__ensure_is_directory(path)
         
         return path 
+    
+    

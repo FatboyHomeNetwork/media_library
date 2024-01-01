@@ -48,7 +48,12 @@ class media_item_path(object):
             
         except: # is not shared; access via admin share
             return self.__as_admin_share()
-        
+     
+     
+     
+     
+    
+       
 
     #
     # Prepare path

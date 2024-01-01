@@ -1,6 +1,6 @@
 ################################################################################################
 #
-#  import_queue
+#  queue
 #
 ################################################################################################
     
@@ -8,18 +8,17 @@ import os
 import json
 import datetime
 
-from file_lock import file_lock
+import file_lock
+
 
 MAX_ATTEMPTS = 2 
+QUEUE_FILE_NAME = 'import.queue'
 
-class import_queue(object):
+class queue(object):
 
     def __init__(self, path):
         
-        QUEUE_FILE_NAME = 'import.queue'
-        
         self.queue_file_path = os.path.join(path, QUEUE_FILE_NAME)
-        
     
     def __load_queue(self):
                 
@@ -36,11 +35,11 @@ class import_queue(object):
     
     def add(self, item):
 
-        lock = file_lock(self.queue_file_path)
+        lock = file_lock.file_lock(self.queue_file_path)
         lock.lock()
                         
         queue = self.__load_queue()
-        queue[item] = [datetime.datetime.now(), 0] # date when added, number of attempets to import 
+        queue[item] = [datetime.datetime.now(), 0] # date when added, number of attempts to import 
         self.__write_queue(queue)
         
         lock.unlock()
@@ -68,7 +67,7 @@ class import_queue(object):
     
     def remove(self, item):
         
-        lock = file_lock(self.queue_file_path)
+        lock = file_lock.file_lock(self.queue_file_path)
         lock.lock()
         
         queue = self.__load_queue()
