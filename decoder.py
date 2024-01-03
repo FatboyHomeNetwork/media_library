@@ -14,10 +14,14 @@ class token(object):
             self.value = ''
 
     def __str__(self):
+        n = self.__class__.__name__ 
         if len(self.value) > 0:
-            return self.__class__.__name__ + ': ' + self.value[0].strip()
+            v = self.value[0].strip()
+            return n # + ': ' + v
+            #return self.__class__.__name__ + ': ' + self.value[0].strip()
         else:
-            return self.__class__.__name__
+            return n
+            #return self.__class__.__name__
 
     def as_string(self):
         if len(self.value) > 0:
@@ -64,11 +68,11 @@ class tokeniser(object):
         if len(s) == 4 and s.isdecimal() and int(s) >= 1900 and int(s) <= date.today().year + 1: 
             return [year_token(s)]
 
-        # normalised seasion & episode eg S03E12
+        # normalised season & episode eg S03E12
         if len(s) == 6 and s[0].lower() == 's' and s[2:3].isdecimal() and s[3:4].lower() == 'e' and s[5:6].isdecimal(): 
             return [season_token(), domain_number_token(str(int(s[2:3]))), episode_token(), domain_number_token(str(int(s[5:6])))]
 
-        # normalised seasion eg S01
+        # normalised season eg S01
         if len(s) == 3 and s[0].lower() == 's' and s[2:3].isdecimal(): 
             return [season_token(), domain_number_token(str(int(s[2:3])))]
         
@@ -76,7 +80,7 @@ class tokeniser(object):
         if len(s) == 3 and s[0].lower() == 'e' and s[2:3].isdecimal(): 
             return [episode_token(), domain_number_token(str(int(s[2:3])))]
         
-        # free form seasion eg: Season: 1 |  s 01 
+        # free form season eg: Season: 1 |  s 01 
         if s.lower() == 'season' or s.lower() == 's':  
             return [season_token(s)]
     
@@ -84,15 +88,16 @@ class tokeniser(object):
         if s.lower() == 'episode' or s.lower() == 'e' or s.lower() == 'part': 
             return [episode_token(s)]
             
-        # A domain number should only be an episode, season or sequal number. 
+        # A domain number should only be an episode, season or sequel number. 
         if len(s) <= 3 and s.isdecimal() and int(s) <= 370: # one episode per day for year plus a few extra. 
+## TODO Simple roman numerals. I, II, III, IV, V, VI. Convert to number values              
             return [domain_number_token(str(int(s)))]  
         
-        # file ext. will only look for std ext used on the Fatboy Home Network (tm)
+        # file ext. will only look for std ext used on the Fatboy Home Network (tm) because the any media we're processes has already been converted, hence is one of the know types 
         if len(s) == 3 and (s.lower() == 'jpg' or s.lower() == 'mp4' or s.lower() == 'mp3' or s.lower() == 'txt'):
             return [ext_token(s)]
 
-        # anthing else is a string
+        # anything else is a string
         if len (s) > 0:
             return [string_token(s)]
         
@@ -220,9 +225,8 @@ class parser(object):
                 if len(title_str) > 0:
                     title_one = title_token(title_str.strip())
                 break
-            
             else:
-                title_str = title_str + e.as_string() + ' ' 
+                title_str = title_str + e.as_string() + ' '
         
         if title_one == None and len(title_str.strip()) > 0: # special case of a string only element
             title_one = title_token(title_str.strip())
@@ -237,7 +241,7 @@ class parser(object):
         for e in elements:
             
             if isinstance(e, ext_token):
-                ext = ext_token
+                ext = e
                 continue
             
             if not isinstance (e, string_token):
@@ -269,18 +273,15 @@ class parser(object):
     
 ################################################################################################
 #
-# decoder  
+# decoder  -- entry point for the decode activity
 #
 ################################################################################################
 
 class decoder(object):
-    
-    def __init__(self, path):
-        self.__path = path
         
-    def decode(self):
+    def decode(self, src_string):
 
-        elements = tokeniser.tokenise(self.__path)
+        elements = tokeniser.tokenise(src_string)
         
         elements = parser.parse_season_episode_numbers(elements)
         elements = parser.parse_domain_numbers_to_string(elements)
@@ -288,18 +289,3 @@ class decoder(object):
         elements = parser.parse_strings_to_titles(elements)
         
         return elements
-
-
-class path_normaliser(object):
-    
-    def __init__(self, path):
-        self.__path = path
-        
-    def normalise(self): 
-        elements = d = decoder(self.__path)
-    
-        return 'normalised_directory'
-
-        
-        
-    

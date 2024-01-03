@@ -60,20 +60,27 @@ class media_library_mgn:
         else:
             logging.error('UNC Path: %s.' % item_path)
         
+    
     def __copyitem(self, src, dst):
         # use dirs_exist_ok=True to replace any previous attempt
         
         try:
             shutil.copytree(src, dst, dirs_exist_ok=True) 
+            return True
         except OSError: 
             shutil.rmtree(dst, ignore_errors=True) 
             os.mkdir(dst)
-            shutil.copy(src, dst)
+            try:
+                shutil.copy(src, dst)
+                return True
+            except:
+                return False
         
     def import_next(self):
     
         src = self.__import_queue.next()
         
+        # can the src be accessed? 
         if not os.path.exists(src):
             logging.error('Media not found: %s.' % src)
             # add to end of queue, goto 
@@ -81,8 +88,13 @@ class media_library_mgn:
         
         # Copy to working location 
         tmp = os.path.join(self.PATHS.WORKING, os.path.split(src)[1])
-        self.__copyitem(src, tmp)
+        successful = self.__copyitem(src, tmp)
         
+        if not successful:
+            logging.error('Copy interrupted: %s.' % src)
+            # add to end of queue, goto 
+            return 
+            
         # Folder Conversion
         fc = folder_converter(tmp)
         tmp = fc.convert() # converter will modify the directory 

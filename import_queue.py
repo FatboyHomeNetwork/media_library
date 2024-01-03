@@ -86,7 +86,22 @@ class queue(object):
         item = None
         
         queue = self.__load_queue()
-                       
+
+## replace with: 
+# attempt()
+#
+# If fail 
+#   move to back to queue
+#
+# attempt loop 
+#   attempt()
+#
+#   if fail   
+#       if date is WEEK/MONTH/3-MONThS since first added to queue
+#           remove from queue  
+#       else
+#           move to back of queue 
+        
         for k, v in queue.items():
             if  v[1] < MAX_ATTEMPTS:
                 v[1] = v[1] + 1
@@ -99,6 +114,14 @@ class queue(object):
         lock.unlock()
         return item 
     
+    ## fail(self, item)
+    #   if fail   
+    #       if date is WEEK/MONTH/3-MONThS since first added to queue
+    #           remove from queue  
+    #       else
+    #           move to back of queue 
+    
+    ## success(self, item)
     def remove(self, item):
         
         lock = file_lock(self.queue_file_path)
