@@ -113,7 +113,7 @@ class series(abstract_media_item):
     
     def normalise(self):
         
-        norm_model = [] # [[org_path, normalised_path],]
+        norm_model = [] 
         for s in self.exp_seasons:
              norm_model.append(s.normalise(self.det_series_title))
         return norm_model 
@@ -241,13 +241,12 @@ class season(abstract_media_item):
     def normalise(self, normalised_series):
         
         rtn = []
-        ## normalised_series + normalised_season + exp_episodes.normalise()
         
         normalised_season = 'Season %s' % self.det_season_number
-        #normalised_season_path = os.path.join(normalised_series, normalised_season)
+        normalised_season_path = os.path.join(normalised_series, normalised_season)
         
         for e in self.exp_episodes:
-            p = os.path.join(normalised_series + normalised_season + e.normalise())
+            p =  + e.normalise(normalised_season_path)
             rtn.append(p)
         
         return rtn
@@ -479,12 +478,12 @@ class episode(abstract_media_item):
         
         return rtn
 
-    def normalise(self):
+    def normalise(self, head):
         
         # series_title (year) SXXEXX episode_title . ext 
         self.cal_normalised_path = '%s (%s) S%sE%s %s.%s' %(self.det_series_title, self.det_year, self.det_season_number, self.det_episode_number, self.det_episode_title, self.exp_ext)
         
-        return self.cal_normalised_path
+        return os.path.join(head,self.cal_normalised_path)
         
     #
     # Cal & det functions
@@ -541,7 +540,7 @@ class episode(abstract_media_item):
 #
 ################################################################################################
 
-import os
+
 
 class normaliser(object):
     
@@ -592,6 +591,8 @@ class normaliser(object):
 # Module support functions 
 #
 ################################################################################################
+
+import os
 
 def create_path_model(src_path):
     

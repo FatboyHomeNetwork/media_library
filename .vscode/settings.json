@@ -8,5 +8,7 @@
         "PROGRAMFILES",
         "topdown",
         "wnet"
-    ]
+    ],
+    "editor.minimap.showSlider": "always",
+    "editor.minimap.size": "proportional"
 }
