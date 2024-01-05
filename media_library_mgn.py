@@ -117,7 +117,9 @@ class media_library_mgn:
             return  
         
         # Path Normalization
+##    add    create_path_model() to create model from path.]
         pn = path_normaliser(tmp)
+        
         normalised_path = pn.normalise() 
         
         # copy to library, remove from working folder and import queue

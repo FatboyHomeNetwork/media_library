@@ -1,3 +1,6 @@
+import decoder
+from decoder import decoder as dc
+
 ################################################################################################
 #
 # Media Item Domain Model 
@@ -28,20 +31,20 @@ class abstract_media_item(object):
         self.cal_year = None
         self.det_year = None
         
-        self.exp_path_tokens = decoder.decode(os.path.basename(self.exp_media_item_path))
+        self.exp_path_tokens = dc.decode(os.path.basename(self.exp_media_item_path))
         
         for e in self.exp_path_tokens: 
             
-            if isinstance(e, dc.title_token):
+            if isinstance(e, decoder.title_token):
                 if self.exp_title_one == None: 
                     self.exp_title_one = e.value[0]
                 else:
                     self.exp_title_two = e.value[0]
             
-            if isinstance(e, dc.year_token): 
+            if isinstance(e, decoder.year_token): 
                 self.exp_year = e.value[0]
                 
-            if isinstance(e, dc.domain_number_token):
+            if isinstance(e, decoder.domain_number_token):
                 self.exp_domain_numbers.append(e.value[0])
 
     def __str__(self):
@@ -61,14 +64,15 @@ class abstract_media_item(object):
         
         return rtn
 
+##################################################
 #
 # class - Series
 #
 class series(abstract_media_item):
     
-    def __init__(self, path):
+    def __init__(self, model):
         
-        super().__init__(path)
+        super().__init__(model)
         
         self.exp_seasons = []
         
@@ -78,11 +82,10 @@ class series(abstract_media_item):
         
         # populate seasons
         natural_collection_position = 1
-        if os.path.exists(path) and os.path.isdir(path):
-            for subdir, dirs, files in os.walk(path):
-                for d in dirs:
-                    self.exp_seasons.append(season(os.path.join(subdir,d),natural_collection_position))
-                    natural_collection_position = natural_collection_position + 1
+        
+        for p in model:
+            self.exp_seasons.append(season(p),natural_collection_position)
+            natural_collection_position = natural_collection_position + 1
 
         # calculate fields 
         self.cal_year = self.calulate_series_year()
@@ -110,21 +113,10 @@ class series(abstract_media_item):
     
     def normalise(self):
         
-        # series_title (year)
-        normalised_series = '%s (%s)' %(self.det_series_title, self.det_year)
-
-        self.cal_normalised_path = os.path.join(os.path.split(self.exp_media_item_path)[0], normalised_series)
-        
-        try:
-            os.replace(self.exp_media_item_path, self.cal_normalised_path)
-        except OSError:
-            import shutil
-            shutil.rmtree(self.cal_normalised_path,ignore_errors=True)
-            os.replace(self.exp_media_item_path, self.cal_normalised_path)
-        
+        norm_model = [] # [[org_path, normalised_path],]
         for s in self.exp_seasons:
-            s.normalise(normalised_series)
-        
+             norm_model.append(s.normalise(self.det_series_title))
+        return norm_model 
     #
     # Cal functions
     #
@@ -192,6 +184,7 @@ class series(abstract_media_item):
         else:
             return self.exp_title_one
         
+##################################################
 #
 # class - Season
 #
@@ -211,18 +204,15 @@ class season(abstract_media_item):
         
         # populate self 
         for e in self.exp_path_tokens: 
-            if isinstance(e, dc.season_token):
+            if isinstance(e, decoder.season_token):
                self.exp_season_number = e.value[0]
         
         # populate episodes
         self.exp_episodes = []
         
-        if os.path.exists(path) and os.path.isdir(path):
-            natural_collection_position = 1
-            for subdir, dirs, files in os.walk(path):
-                for f in files:
-                    self.exp_episodes.append(episode(os.path.join(subdir,f), natural_collection_position))
-                    natural_collection_position = natural_collection_position + 1
+        for p in self.__model:
+            self.exp_episodes.append(episode(p), natural_collection_position)
+            natural_collection_position = natural_collection_position + 1
 
         # Set episodes properities based on series and seasion values 
         self.cal_season_number = self.__calulate_season_number()
@@ -249,24 +239,18 @@ class season(abstract_media_item):
         return rtn
     
     def normalise(self, normalised_series):
-        head_path = os.path.split(os.path.split(self.exp_media_item_path)[0])[0]
         
-        current_season = os.path.split(self.exp_media_item_path)[1]
-        self.exp_media_item_path = os.path.join(head_path, normalised_series, current_season)
+        rtn = []
+        ## normalised_series + normalised_season + exp_episodes.normalise()
         
-        # Season XX
-        normalised_seasion = 'Season %s' % self.det_season_number
-        self.cal_normalised_path = os.path.join(head_path, normalised_series, normalised_seasion)
-        
-        try:
-            os.replace(self.exp_media_item_path, self.cal_normalised_path)
-        except OSError:
-            import shutil
-            shutil.rmtree(self.cal_normalised_path,ignore_errors=True)
-            os.replace(self.exp_media_item_path, self.cal_normalised_path)
+        normalised_season = 'Season %s' % self.det_season_number
+        #normalised_season_path = os.path.join(normalised_series, normalised_season)
         
         for e in self.exp_episodes:
-            e.normalise(normalised_series,normalised_seasion)
+            p = os.path.join(normalised_series + normalised_season + e.normalise())
+            rtn.append(p)
+        
+        return rtn
 
     #
     #  series functions - called by series 
@@ -438,6 +422,8 @@ class season(abstract_media_item):
         else:
             return self.cal_season_number.zfill(2)
 
+
+##################################################
 #
 # class - Episode
 #
@@ -462,13 +448,13 @@ class episode(abstract_media_item):
         self.det_episode_title = None
                         
         for e in self.exp_path_tokens:
-            if isinstance (e, dc.episode_token) and self.exp_episode_number == None:
+            if isinstance (e, decoder.episode_token) and self.exp_episode_number == None:
                 self.exp_episode_number = e.value[0]
 
-            if isinstance(e, dc.season_token) and self.exp_season_number == None:
+            if isinstance(e, decoder.season_token) and self.exp_season_number == None:
                self.exp_season_number = e.value[0]
                
-            if isinstance(e, dc.ext_token):
+            if isinstance(e, decoder.ext_token):
                 self.exp_ext = e.value[0]
 
         self.cal_episode_number = self.__calulate_episode_number()
@@ -493,18 +479,12 @@ class episode(abstract_media_item):
         
         return rtn
 
-    def normalise(self, normalised_series, normalised_season):
+    def normalise(self):
         
         # series_title (year) SXXEXX episode_title . ext 
-        normalised_episode = '%s (%s) S%sE%s %s.%s' %(self.det_series_title, self.det_year, self.det_season_number, self.det_episode_number, self.det_episode_title, self.exp_ext)
+        self.cal_normalised_path = '%s (%s) S%sE%s %s.%s' %(self.det_series_title, self.det_year, self.det_season_number, self.det_episode_number, self.det_episode_title, self.exp_ext)
         
-        path_head = os.path.split(os.path.split(os.path.split(self.exp_media_item_path)[0])[0])[0] 
-        self.cal_normalised_path = os.path.join(path_head, normalised_series, normalised_season, normalised_episode)
-
-        print('cal_normalised_path',self.cal_normalised_path)
-        
-   #     os.rename (self.exp_media_item_path, self.cal_normalised_path)
-        self.exp_media_item_path = self.cal_normalised_path 
+        return self.cal_normalised_path
         
     #
     # Cal & det functions
@@ -562,12 +542,11 @@ class episode(abstract_media_item):
 ################################################################################################
 
 import os
-from decoder import decoder
 
 class normaliser(object):
     
-    def __init__(self, path):
-        self.__path = path
+    def __init__(self, model):
+        self.__model = model
     
     def __contains_series(self, elements):
         
@@ -584,19 +563,13 @@ class normaliser(object):
         
         total_items = 0 
         series_items = 0 
-        
-        if os.path.exists(self.__path) and os.path.isdir(self.__path):
-            for subdir, dirs, files in os.walk(self.__path):
-                for d in dirs:
-                    total_items = total_items + 1    
-                    if self.__contains_series(decoder.decode(d)):
-                        series_items = series_items + 1
-                    
-                for f in files:
-                    total_items = total_items + 1
-                    if self.__contains_series(decoder.decode(f)):
-                        series_items = series_items + 1
-                        
+
+        for p in self.__model:
+            #dc = decoder.decoder()
+            if self.__contains_series(dc.decode(p)):
+                series_items = series_items + 1
+            total_items = total_items + 1
+            
         if series_items >= total_items * AGREEMENT:
             return True
         else:
@@ -604,13 +577,30 @@ class normaliser(object):
    
     def normalise(self):
         
-        norm_path = None
+        norm_path_model = None
         
-        if self.__is_series():
-            media_item = series(self.__path)
-            media_item.normalise()
-            norm_path = media_item.cal_normalised_path
-        else: 
-            print('Not a Series()')
+        media_item = series(self.__model)
+        norm_path_model = media_item.normalise()
+        norm_path_model = media_item.cal_normalised_path
+        norm_path_model = self.__model.copy()            
         
-        return norm_path
+        return norm_path_model
+
+
+################################################################################################
+#
+# Module support functions 
+#
+################################################################################################
+
+def create_path_model(src_path):
+    
+    path_model = []
+    
+    if os.path.exists(src_path) and os.path.isdir(src_path):
+        for subdir, dirs, files in os.walk(src_path):
+            for f in files:
+                p = os.path.join(subdir, f)
+                path_model.append(p)
+    
+    return path_model

@@ -38,3 +38,11 @@ Part of the Fatboy Home Network. Provides a network wide library of media -- mov
 - **MEDIA_LIBRARY\Pictures** -- destination for all image files. User access point.
 - **MEDIA_LIBRARY\Videos** -- destination for sub set of video files. User access point.
 - **MEDIA_LIBRARY\Music** --  destination for all music. User access point. Shortcut to iTunes managed directory space. 
+
+# Media Normalise 
+
+Normaliser takes most forms of human readable media names and folder structures and return them as the following standard formats:
+
+- **Series / Episodic** -- Series Name\Season 01\Series Name (Year) S01E01 Episode Name.ext
+- **Movie** -- Movie Name (Year)\Movie Name (Year).ext
+

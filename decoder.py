@@ -5,29 +5,27 @@
 ################################################################################################
 
 class token(object):
+    
     value = ''
     
     def __init__(self, *value):
+        
         if len(value) > 0:
             self.value = value[0]
         else:
-            self.value = ''
-
-    def __str__(self):
-        n = self.__class__.__name__ 
-        if len(self.value) > 0:
-            v = self.value[0].strip()
-            return n # + ': ' + v
-            #return self.__class__.__name__ + ': ' + self.value[0].strip()
-        else:
-            return n
-            #return self.__class__.__name__
+            self.value = ('')
 
     def as_string(self):
         if len(self.value) > 0:
             return self.value[0].strip()
         else:
             return ''
+    
+    def debug_string(self):
+        if len(self.value) > 0:
+            return self.__class__.__name__ + ': ' + self.value[0].strip()
+        else:
+            return self.__class__.__name__
 
 class title_token(token):
     def __init__(self, *value):
@@ -60,7 +58,7 @@ class string_token(token):
 
 class tokeniser(object):
     
-    def __token_factory(s):
+    def __as_token(s):
         
         from datetime import date
         
@@ -70,15 +68,16 @@ class tokeniser(object):
 
         # normalised season & episode eg S03E12
         if len(s) == 6 and s[0].lower() == 's' and s[2:3].isdecimal() and s[3:4].lower() == 'e' and s[5:6].isdecimal(): 
-            return [season_token(), domain_number_token(str(int(s[2:3]))), episode_token(), domain_number_token(str(int(s[5:6])))]
+            return [season_token(), domain_number_token(str(int(s[1:3]))), episode_token(), domain_number_token(str(int(s[4:6])))]
 
         # normalised season eg S01
-        if len(s) == 3 and s[0].lower() == 's' and s[2:3].isdecimal(): 
-            return [season_token(), domain_number_token(str(int(s[2:3])))]
+        if len(s) == 3 and s[0].lower() == 's' and s[1:3].isdecimal(): 
+            return [season_token(), domain_number_token(str(int(s[1:3])))]
+            
         
         # normalised episode eg E12
-        if len(s) == 3 and s[0].lower() == 'e' and s[2:3].isdecimal(): 
-            return [episode_token(), domain_number_token(str(int(s[2:3])))]
+        if len(s) == 3 and s[0].lower() == 'e' and s[1:3].isdecimal(): 
+            return [episode_token(), domain_number_token(str(int(s[1:3])))]
         
         # free form season eg: Season: 1 |  s 01 
         if s.lower() == 'season' or s.lower() == 's':  
@@ -103,25 +102,26 @@ class tokeniser(object):
         
         return []
 
-
     def tokenise(value):
 
         elements = [] 
         s = ''
         
+## TODO this loop is a bit shit. rework to remove duplicate code & optimise calls to __as_token()
         for c in value:
-            if c.isalpha() or c.isnumeric():
+            if c.isalpha() or c.isnumeric() or c == "\'": 
                 s = s + c
             
             else: # is a white space, so end of a token
                 if len(s) > 0:
-                    for e in tokeniser.__token_factory(s):
+                    for e in tokeniser.__as_token(s):
                         elements.append(e)
                     s = ''
         
         # pick up the last element
-        if len(tokeniser.__token_factory(s)) > 0:
-            elements.append(tokeniser.__token_factory(s)[0]) 
+        if len(tokeniser.__as_token(s)) > 0:
+            for e in tokeniser.__as_token(s):
+                elements.append(e)
     
         return elements 
     
@@ -205,10 +205,10 @@ class parser(object):
                     rtn.append(string_token(e.value[0]))    
             else:
                 rtn.append(e)    
-            
+
         return rtn
 
-    def parse_strings_to_titles(elements):
+    def parse_strings_to_title_one(elements):
         #    
         # <string>* <number> (title 1) | <year> | <ep> | <se> | <string>* <number> (title 2) | <ext>
         # <string>* <number> (title 1) | <year> | <ep> | <se> | <ext> 
@@ -216,76 +216,69 @@ class parser(object):
         # <string>* <number> (title 1)
         #
         
-        # title 1
-        title_one = None
+        title = None
         title_str = ''
         
-        for e in elements:
-            if isinstance(e, year_token) or isinstance (e, season_token) or isinstance(e, episode_token) or isinstance(e, ext_token):
-                if len(title_str) > 0:
-                    title_one = title_token(title_str.strip())
-                break
-            else:
-                title_str = title_str + e.as_string() + ' '
+        rtn = elements.copy()
         
-        if title_one == None and len(title_str.strip()) > 0: # special case of a string only element
-            title_one = title_token(title_str.strip())
-            
-        # title 2
-        title_two = None
+        for e in elements:
+            if isinstance(e, string_token):
+                title_str += e.as_string().strip() + ' ' 
+                rtn.remove(e) # eat strings
+            elif isinstance(e, year_token) or isinstance (e, season_token) or isinstance(e, episode_token) or isinstance(e, ext_token):
+                title = title_token(title_str.strip())
+                rtn.insert(0, title) # insert strings as title
+                return rtn
+        
+        title = title_token(title_str.strip())
+        rtn.insert(0, title) # insert strings as title
+
+        return rtn
+
+    def parse_strings_to_title_two(elements):
+        #    
+        # <string>* <number> (title 1) | <year> | <ep> | <se> | <string>* <number> (title 2) | <ext>
+        # <string>* <number> (title 1) | <year> | <ep> | <se> | <ext> 
+        # <string>* <number> (title 1) | <year> | <ext>
+        # <string>* <number> (title 1)
+        #
+        
+        title = None
         title_str = ''
-        ext = None
         
-        elements.reverse()
-        
-        for e in elements:
-            
-            if isinstance(e, ext_token):
-                ext = e
-                continue
-            
-            if not isinstance (e, string_token):
-                if len(title_str) > 0:
-                    title_two = title_token(title_str.strip())
-
-            else:
-                title_str = e.as_string()  + ' ' +  title_str
-        
-        elements.reverse()        
-        
-        # replace the start and end string with the two titles
-        rtn = []
-        if title_one != None:
-            rtn.append(title_one)
+        rtn = elements.copy()
         
         for e in elements:
-            if not isinstance (e, string_token):
-                rtn.append(e)
-
-        if title_two != None:
-            rtn.append(title_two)
+            if isinstance(e, string_token):
+                title_str += e.as_string().strip() + ' ' 
+                rtn.remove(e) # eat strings
         
-        # add back the extension 
-        if ext != None:
-            rtn.append(ext)
-    
+        if len(title_str.strip()) > 0:
+            title = title_token(title_str.strip())
+            rtn.append(title) 
+        
         return rtn
     
 ################################################################################################
 #
-# decoder  -- entry point for the decode activity
+# decoder -- entry point for the decode activity
 #
 ################################################################################################
 
 class decoder(object):
         
-    def decode(self, src_string):
+    def decode(src_string):
 
         elements = tokeniser.tokenise(src_string)
         
-        elements = parser.parse_season_episode_numbers(elements)
-        elements = parser.parse_domain_numbers_to_string(elements)
-        elements = parser.parse_season_episode_tokens_to_string(elements)
-        elements = parser.parse_strings_to_titles(elements)
+        ## adding domain numbers to season_episode tokens 
+        season_episode = parser.parse_season_episode_numbers(elements)
         
-        return elements
+        domain_numbers_to_string = parser.parse_domain_numbers_to_string(season_episode)
+        season_episode_tokens_to_string = parser.parse_season_episode_tokens_to_string(domain_numbers_to_string)
+        
+        strings_to_title_one = parser.parse_strings_to_title_one(season_episode_tokens_to_string)
+        strings_to_title_two = parser.parse_strings_to_title_two(strings_to_title_one)
+        
+        return strings_to_title_two
+        
