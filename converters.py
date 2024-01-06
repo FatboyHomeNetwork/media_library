@@ -27,7 +27,7 @@ class path_converter__PROD(object):
     def is_unc_path(self):
         # see: file path formats on windows systems.pdf 
         
-        if len(self.__path) > 3 and self.__path[0:2] == '\\\\' and self.__path[2:3] != '?' and self.__path[2:3] != '.':
+        if len(self.__path) > 3 and self.__path[0:2] == r'\\' and self.__path[2:3] != '?' and self.__path[2:3] != '.':
             return True 
         else:
             return False
@@ -36,7 +36,7 @@ class path_converter__PROD(object):
         # C:\Dir\subDir\etc. -> \\<machine name>\C$\Dir\subDir\etc. 
         
         if  not self.is_unc_path(): # eg, is C:\Dir\subDir\etc 
-            return  '\\\\' +  platform.node() + '\\' + self.__path.replace(':','$',1)
+            return  r'\\' +  platform.node() + r'\' + self.__path.replace(':','$',1)
         else: 
             raise Exception('Cannot convert UNC to admin share format.')
     
@@ -159,7 +159,9 @@ class mime_type(object):
     VIDEO = 2
     AUDIO = 3
     TEXT = 4
+    
     APPLICATION = 5
+    
     NOT_SUPPORTED = 99
 
 class media_converter:
@@ -196,6 +198,8 @@ class media_converter:
             return os.path.splitext(src)[0] + '.mp4'
         elif mime_type == self.TYPES.AUDIO:
             return os.path.splitext(src)[0] + '.mp3'
+        elif mime_type == self.TYPES.TEXT:
+            return src
         else:
             return src
     
@@ -218,6 +222,9 @@ class media_converter:
         
         elif mime_type[TYPE] == 'application' and mime_type[SUBTYPE]  == 'octet-stream': ## TODO: also include extensions
             return self.TYPES.AUDIO
+        
+        elif mime_type[TYPE] == 'application':
+            return self.TYPES.APPLICATION
         
         elif mime_type[TYPE] == 'text':
             return self.TYPES.TEXT
@@ -244,6 +251,7 @@ class media_converter:
         else:
             return self.__get_mime_type(file_path)
     
+    
     def convert(self):
 
         for subdir, dirs, files in os.walk(self.__media_path, topdown=False):
@@ -252,14 +260,20 @@ class media_converter:
                 src = os.path.join(subdir, file)
                 type = self.__get_mime_type(file)
                 
-                if type in [self.TYPES.IMAGE, self.TYPES.VIDEO, self.TYPES.AUDIO]: 
+                if type in [self.TYPES.IMAGE, self.TYPES.VIDEO, self.TYPES.AUDIO, self.TYPES.TEXT]: 
                     dst = self.__set_destination_ext(type, src)
                     
                     if os.path.splitext(src)[1] != os.path.splitext(dst)[1]:
                         ff = ffmpy.FFmpeg(executable=FFMPEG_PATH, inputs={src: None}, outputs={dst: '-y'})
                         #ff.run()
+                        
+                        ## Dev hack 
                         print ('** shutil.copy(src, dst) **')
                         shutil.copy(src, dst)
+                        
                         os.remove(src)
-        
+                else:
+                    os.remove(src)
+                    
+                    
         return self.mime_type()

@@ -46,3 +46,5 @@ Normaliser takes most forms of human readable media names and folder structures 
 - **Series / Episodic** -- Series Name\Season 01\Series Name (Year) S01E01 Episode Name.ext
 - **Movie** -- Movie Name (Year)\Movie Name (Year).ext
 
+Music normalisation is managed by iTunes
+

@@ -15,8 +15,10 @@ from decoder import decoder as dc
 #
 class abstract_media_item(object):
 
-    def __init__(self, path):
-                
+    def __init__(self, path, model):
+        
+        self.exp_model = model
+        
         self.exp_media_item_path = path     
         self.cal_normalised_path = None
         
@@ -31,7 +33,7 @@ class abstract_media_item(object):
         self.cal_year = None
         self.det_year = None
         
-        self.exp_path_tokens = dc.decode(os.path.basename(self.exp_media_item_path))
+        self.exp_path_tokens = dc.decode(self.exp_media_item_path)
         
         for e in self.exp_path_tokens: 
             
@@ -72,7 +74,7 @@ class series(abstract_media_item):
     
     def __init__(self, model):
         
-        super().__init__(model)
+        super().__init__('', model)
         
         self.exp_seasons = []
         
@@ -82,9 +84,24 @@ class series(abstract_media_item):
         
         # populate seasons
         natural_collection_position = 1
+                
+        #episode_name = os.path.split(os.path.split(path)[0])[1]
+        #print (episode_name)
+        
+        # loop over model
+            # pull out new season name
+            # if new season name == old season name
+            #   add path to season model 
+            # else
+            #   season model . append (new season (season model))
+            #   season model = []
+            #   old season name = new season name 
+            
+        
         
         for p in model:
-            self.exp_seasons.append(season(p),natural_collection_position)
+            
+            self.exp_seasons.append(season(p, model, natural_collection_position))
             natural_collection_position = natural_collection_position + 1
 
         # calculate fields 
@@ -112,11 +129,34 @@ class series(abstract_media_item):
         return rtn
     
     def normalise(self):
+        #   current_series = ''
+        # for line in self.__model:
+        #     sn = self.__get_series_name(line)
+            
+        #     if sn == current_series:
+        #         series_model
+        #     else:
+        #         s = series(sn, series_model)
+        #         norm_model = s.normalise()
+        #         series_model = []
+        # norm_model = [] 
+        # for s in self.exp_seasons:
+        #      norm_model.append(s.normalise(self.det_series_title))
         
-        norm_model = [] 
-        for s in self.exp_seasons:
-             norm_model.append(s.normalise(self.det_series_title))
-        return norm_model 
+        
+        
+           
+    # def __get_series_name(self, path):
+        
+    #     episode_path =  os.path.split(path)[0]
+    #     season_path =  os.path.split(episode_path)[0]
+        
+    #     return os.path.split(season_path)[1]
+        
+                
+        # return norm_model 
+        print()
+
     #
     # Cal functions
     #
@@ -190,8 +230,8 @@ class series(abstract_media_item):
 #
 class season(abstract_media_item):
     
-    def __init__(self, path, pos):
-        super().__init__(path)
+    def __init__(self, path, model, pos):
+        super().__init__(path, model)
         
         self.exp_pos = pos
         
@@ -210,8 +250,10 @@ class season(abstract_media_item):
         # populate episodes
         self.exp_episodes = []
         
-        for p in self.__model:
-            self.exp_episodes.append(episode(p), natural_collection_position)
+        natural_collection_position = 0
+        
+        for p in self.exp_model:
+            self.exp_episodes.append(episode(p, model, natural_collection_position))
             natural_collection_position = natural_collection_position + 1
 
         # Set episodes properities based on series and seasion values 
@@ -246,10 +288,11 @@ class season(abstract_media_item):
         normalised_season_path = os.path.join(normalised_series, normalised_season)
         
         for e in self.exp_episodes:
-            p =  + e.normalise(normalised_season_path)
+            p = e.normalise(normalised_season_path)
             rtn.append(p)
-        
+
         return rtn
+    
 
     #
     #  series functions - called by series 
@@ -409,7 +452,7 @@ class season(abstract_media_item):
         import operator
         seasons = sorted(seasons.items(), key=operator.itemgetter(1), reverse=True)
         
-        if seasons[0][1] > (len(self.exp_episodes) * AGREEMENT): 
+        if len(seasons) > 0 and seasons[0][1] > (len(self.exp_episodes) * AGREEMENT): 
             return seasons[0][0]
         else:
             return None
@@ -417,9 +460,9 @@ class season(abstract_media_item):
     def __determine_season_number(self):
         # use explicit season number if it exists, else use calculated season numnber   
         if self.exp_season_number != None:
-            return self.exp_season_number.zfill(2)
+            return str(self.exp_season_number).zfill(2)
         else:
-            return self.cal_season_number.zfill(2)
+            return str(self.cal_season_number).zfill(2)
 
 
 ##################################################
@@ -428,8 +471,8 @@ class season(abstract_media_item):
 #
 class episode(abstract_media_item):
    
-    def __init__(self, path, pos):
-        super().__init__(path)
+    def __init__(self, path, model, pos):
+        super().__init__(path, model)
         
         self.exp_pos = pos
         self.exp_ext = None
@@ -496,9 +539,9 @@ class episode(abstract_media_item):
         # if there is no expicit episode number, use calculated episode number
         
         if self.exp_episode_number != None:
-            return self.exp_episode_number.zfill(2)
+            return str(self.exp_episode_number).zfill(2)
         else:
-            return self.cal_episode_number.zfill(2)
+            return str(self.cal_episode_number).zfill(2)
     
     #
     # Det functions called by seasion 
@@ -540,8 +583,6 @@ class episode(abstract_media_item):
 #
 ################################################################################################
 
-
-
 class normaliser(object):
     
     def __init__(self, model):
@@ -564,8 +605,7 @@ class normaliser(object):
         series_items = 0 
 
         for p in self.__model:
-            #dc = decoder.decoder()
-            if self.__contains_series(dc.decode(p)):
+            if self.__contains_series(dc.decode(p[0])):
                 series_items = series_items + 1
             total_items = total_items + 1
             
@@ -576,14 +616,20 @@ class normaliser(object):
    
     def normalise(self):
         
-        norm_path_model = None
+        # __is_series?
+        # check model for  ser/sea/ep paths
         
-        media_item = series(self.__model)
-        norm_path_model = media_item.normalise()
-        norm_path_model = media_item.cal_normalised_path
-        norm_path_model = self.__model.copy()            
+        self.__norm_model = []
         
-        return norm_path_model
+        if self.__is_series():
+                
+            s = series(self.__model)
+            self.__norm_model = s.normalise()
+        
+        else:
+            print ('** not a series')
+            
+        return self.__norm_model
 
 
 ################################################################################################
