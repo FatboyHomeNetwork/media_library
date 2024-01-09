@@ -1,3 +1,4 @@
+
 ################################################################################################
 #
 # tokeniser. strings are converted into domain tokens. 
@@ -55,6 +56,7 @@ class string_token(token):
     def __init__(self, *value):
         super().__init__(value)
 
+import re
 
 class tokeniser(object):
     
@@ -66,27 +68,27 @@ class tokeniser(object):
         if len(s) == 4 and s.isdecimal() and int(s) >= 1900 and int(s) <= date.today().year + 1: 
             return [year_token(s)]
 
-        # normalised season & episode eg S03E12
-        if len(s) == 6 and s[0].lower() == 's' and s[2:3].isdecimal() and s[3:4].lower() == 'e' and s[5:6].isdecimal(): 
-            return [season_token(), domain_number_token(str(int(s[1:3]))), episode_token(), domain_number_token(str(int(s[4:6])))]
-
-        # normalised season eg S01
-        if len(s) == 3 and s[0].lower() == 's' and s[1:3].isdecimal(): 
-            return [season_token(), domain_number_token(str(int(s[1:3])))]
-            
+        ## Sea & Ep 
+        season_pattern = re.compile(r'(season|s)\s*[0-9]{1,3}',flags=re.IGNORECASE) 
+        episode_pattern = re.compile(r'(episode|e|part)\s*[0-9]{1,3}',flags=re.IGNORECASE)
         
-        # normalised episode eg E12
-        if len(s) == 3 and s[0].lower() == 'e' and s[1:3].isdecimal(): 
-            return [episode_token(), domain_number_token(str(int(s[1:3])))]
+        number_pattern = re.compile('[0-9]{1,3}')
         
-        # free form season eg: Season: 1 |  s 01 
-        if s.lower() == 'season' or s.lower() == 's':  
-            return [season_token(s)]
+        season_episode = []
+        
+        season_match = season_pattern.search(s)
+        if season_match:
+            season_episode.append(season_token())
+            season_episode.append(domain_number_token(int(number_pattern.search(season_match.group()).group())))
     
-        # free form episode eg: episode 1 |  e 01 | part 3
-        if s.lower() == 'episode' or s.lower() == 'e' or s.lower() == 'part': 
-            return [episode_token(s)]
+        episode_match = episode_pattern.search(s)
+        if episode_match:
+            season_episode.append(episode_token())
+            season_episode.append(domain_number_token(int(number_pattern.search(episode_match.group()).group())))
             
+        if season_match or episode_match:
+            return season_episode
+
         # A domain number should only be an episode, season or sequel number. 
         if len(s) <= 3 and s.isdecimal() and int(s) <= 370: # one episode per day for year plus a few extra. 
 ## TODO Simple roman numerals. I, II, III, IV, V, VI. Convert to number values              
@@ -114,14 +116,12 @@ class tokeniser(object):
             
             else: # is a white space, so end of a token
                 if len(s) > 0:
-                    for e in tokeniser.__as_token(s):
-                        elements.append(e)
+                    elements.append(tokeniser.__as_token(s))
                     s = ''
         
         # pick up the last element
         if len(tokeniser.__as_token(s)) > 0:
-            for e in tokeniser.__as_token(s):
-                elements.append(e)
+            elements.append(tokeniser.__as_token(s))
     
         return elements 
     

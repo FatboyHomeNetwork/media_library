@@ -87,10 +87,10 @@ class media_library_mgn:
             return 
         
         # Copy to working location 
-        tmp = os.path.join(self.PATHS.WORKING, os.path.split(src)[1])
-        successful = self.__copyitem(src, tmp)
+        media_name = os.path.split(src)[1]
+        tmp = os.path.join(self.PATHS.WORKING, media_name)
         
-        if not successful:
+        if not self.__copyitem(src, tmp):
             logging.error('Copy interrupted: %s.' % src)
             # add to end of queue, goto 
             return 
@@ -110,22 +110,25 @@ class media_library_mgn:
             return 
         
         if media_type == mc.TYPES.AUDIO:
-            logging.debug('Audio imported: %s.' % src)
+            logging.debug('Audio import: %s.' % src)
             ## TODO copy to iTurn auto import folder
             shutil.rmtree(tmp, ignore_errors=True) 
             self.__import_queue.remove(src)
             return  
         
-        # Path Normalization
-##    add    create_path_model() to create model from path.]
-        pn = path_normaliser(tmp)
+        # model = create_path_model(self.PATHS.WORKING, media_name)
+        # n = normaliser(model)
+        # norm_model = n.normalise()
         
-        normalised_path = pn.normalise() 
+        # rename in the tmp directory..
         
-        # copy to library, remove from working folder and import queue
-        self.__copyitem(tmp, os.path.join(self.PATHS.MEDIA, normalised_path))
-        shutil.rmtree(tmp, ignore_errors=True)
-        self.__import_queue.remove(src)
         
-        logging.debug('Media imported: %s.' % src)
+        
+        
+        # # copy to library, remove from working folder and import queue
+        # self.__copyitem(tmp, os.path.join(self.PATHS.MEDIA, normalised_path))
+        # shutil.rmtree(tmp, ignore_errors=True)
+        # self.__import_queue.remove(src)
+        
+        # logging.debug('Media imported: %s.' % src)
     

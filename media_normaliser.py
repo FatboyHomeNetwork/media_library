@@ -17,9 +17,10 @@ class abstract_media_item(object):
 
     def __init__(self, path, model):
         
+        self.exp_media_item_path = path     
         self.exp_model = model
         
-        self.exp_media_item_path = path     
+        self.cal_norm_model = []
         self.cal_normalised_path = None
         
         #self.path = self.exp_media_item_path
@@ -78,31 +79,33 @@ class series(abstract_media_item):
         
         self.exp_seasons = []
         
-        # title is managed by commmon_item
+        # title is managed by common_item
         self.cal_series_title = None
         self.det_series_title = None
         
         # populate seasons
         natural_collection_position = 1
-                
-        #episode_name = os.path.split(os.path.split(path)[0])[1]
-        #print (episode_name)
         
-        # loop over model
-            # pull out new season name
-            # if new season name == old season name
-            #   add path to season model 
-            # else
-            #   season model . append (new season (season model))
-            #   season model = []
-            #   old season name = new season name 
-            
+        ## Populate the seasons within this series        
+        season_name = os.path.split(os.path.split(self.exp_model[0][0])[0])[1]
+        season_model = []
         
-        
-        for p in model:
-            
-            self.exp_seasons.append(season(p, model, natural_collection_position))
-            natural_collection_position = natural_collection_position + 1
+        next_season_name = ''
+
+        for p in self.exp_model:
+            next_season_name = os.path.split(os.path.split(p[0])[0])[1]
+
+            if  season_name == next_season_name:
+                season_model.append(p[0])
+            else:
+                natural_collection_position = natural_collection_position + 1
+                self.exp_seasons.append(season(season_name, season_model, natural_collection_position))
+                    
+                season_name = next_season_name
+                season_model = []
+                season_model.append(p[0])
+
+        self.exp_seasons.append(season(season_name, season_model, natural_collection_position))
 
         # calculate fields 
         self.cal_year = self.calulate_series_year()
@@ -129,33 +132,16 @@ class series(abstract_media_item):
         return rtn
     
     def normalise(self):
-        #   current_series = ''
-        # for line in self.__model:
-        #     sn = self.__get_series_name(line)
-            
-        #     if sn == current_series:
-        #         series_model
-        #     else:
-        #         s = series(sn, series_model)
-        #         norm_model = s.normalise()
-        #         series_model = []
-        # norm_model = [] 
-        # for s in self.exp_seasons:
-        #      norm_model.append(s.normalise(self.det_series_title))
+        self.cal_norm_model = []
         
+        self.cal_normalised_path = self.det_series_title
         
+        for s in self.exp_seasons:
+            season_model = s.normalise()
+            for e in season_model:
+                self.cal_norm_model.append(os.path.join(self.cal_normalised_path, e))
         
-           
-    # def __get_series_name(self, path):
-        
-    #     episode_path =  os.path.split(path)[0]
-    #     season_path =  os.path.split(episode_path)[0]
-        
-    #     return os.path.split(season_path)[1]
-        
-                
-        # return norm_model 
-        print()
+        return self.cal_norm_model 
 
     #
     # Cal functions
@@ -249,13 +235,13 @@ class season(abstract_media_item):
         
         # populate episodes
         self.exp_episodes = []
-        
         natural_collection_position = 0
         
         for p in self.exp_model:
-            self.exp_episodes.append(episode(p, model, natural_collection_position))
+            episode_path = os.path.split(p)[1]
+            self.exp_episodes.append(episode(episode_path, None, natural_collection_position))
             natural_collection_position = natural_collection_position + 1
-
+        
         # Set episodes properities based on series and seasion values 
         self.cal_season_number = self.__calulate_season_number()
         self.det_season_number = self.__determine_season_number()
@@ -266,8 +252,7 @@ class season(abstract_media_item):
             e.set_determine_season_number(self.det_season_number)
 
         self.__calulate_episodes_title()
-
-
+  
     def __str__(self):
         rtn = '%sexp pos: %s\n' % (super().__str__(), self.exp_pos)
         
@@ -280,19 +265,14 @@ class season(abstract_media_item):
         
         return rtn
     
-    def normalise(self, normalised_series):
+    def normalise(self):
         
-        rtn = []
-        
-        normalised_season = 'Season %s' % self.det_season_number
-        normalised_season_path = os.path.join(normalised_series, normalised_season)
+        self.cal_normalised_path = 'Season %s' % self.det_season_number
         
         for e in self.exp_episodes:
-            p = e.normalise(normalised_season_path)
-            rtn.append(p)
+            self.cal_norm_model.append(os.path.join(self.cal_normalised_path, e.normalise()))    
 
-        return rtn
-    
+        return self.cal_norm_model
 
     #
     #  series functions - called by series 
@@ -521,12 +501,12 @@ class episode(abstract_media_item):
         
         return rtn
 
-    def normalise(self, head):
+    def normalise(self):
         
         # series_title (year) SXXEXX episode_title . ext 
         self.cal_normalised_path = '%s (%s) S%sE%s %s.%s' %(self.det_series_title, self.det_year, self.det_season_number, self.det_episode_number, self.det_episode_title, self.exp_ext)
         
-        return os.path.join(head,self.cal_normalised_path)
+        return os.path.join(self.cal_normalised_path)
         
     #
     # Cal & det functions
@@ -605,7 +585,8 @@ class normaliser(object):
         series_items = 0 
 
         for p in self.__model:
-            if self.__contains_series(dc.decode(p[0])):
+            d = dc.decode(p)
+            if self.__contains_series(d):
                 series_items = series_items + 1
             total_items = total_items + 1
             
@@ -624,6 +605,7 @@ class normaliser(object):
         if self.__is_series():
                 
             s = series(self.__model)
+            
             self.__norm_model = s.normalise()
         
         else:
@@ -640,14 +622,16 @@ class normaliser(object):
 
 import os
 
-def create_path_model(src_path):
+def create_path_model(working, media_name):
     
     path_model = []
     
-    if os.path.exists(src_path) and os.path.isdir(src_path):
-        for subdir, dirs, files in os.walk(src_path):
+    media_path = os.path.join(working, media_name )
+    
+    if os.path.exists(media_path) and os.path.isdir(media_path):
+        for subdir, dirs, files in os.walk(media_path):
             for f in files:
-                p = os.path.join(subdir, f)
+                p =  os.path.join(subdir, f).replace(working,'')
                 path_model.append(p)
     
     return path_model
