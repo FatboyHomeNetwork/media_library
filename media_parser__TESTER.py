@@ -1,11 +1,6 @@
 import os
 
-from parser import parser
-
-MEDIA_FOLDER =r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_normaliser\wild_media_folders.list'
-MEDIA_FILE_NAMES = r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_normaliser\wild_media_filenames.list'
-STRUCTURED_NAMES = r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_normaliser\structured_names.list'
-DEV_TEST = r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_normaliser\dev_test.list'
+from media_parser import parser
 
 
 def gen_test_file(src_path, data_file):
@@ -49,6 +44,12 @@ def review_test_file(fn):
 #  Test Entry Point
 #
 ################################################################################################
+
+MEDIA_FOLDER =r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_normaliser\wild_media_folders.list'
+MEDIA_FILE_NAMES = r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_normaliser\wild_media_filenames.list'
+STRUCTURED_NAMES = r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_normaliser\structured_names.list'
+
+DEV_TEST = r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_normaliser\normaliser\dev.list'
 
 if __name__ == "__main__":
     

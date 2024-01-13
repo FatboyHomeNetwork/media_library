@@ -1,3 +1,5 @@
+import os
+
 
 ################################################################################################
 #
@@ -24,7 +26,7 @@ class token(object):
     
     def debug_string(self):
         if len(self.value) > 0:
-            return self.__class__.__name__ + ': ' + self.value[0].strip()
+            return self.__class__.__name__ + ': ' + str(self.value[0]).strip()
         else:
             return self.__class__.__name__
 
@@ -56,12 +58,12 @@ class string_token(token):
     def __init__(self, *value):
         super().__init__(value)
 
-import re
-
 
 ################################################################################################
 #
 # tokeniser class
+
+import re    
 
 class tokeniser(object):
     
@@ -73,10 +75,9 @@ class tokeniser(object):
         if len(s) == 4 and s.isdecimal() and int(s) >= 1900 and int(s) <= date.today().year + 1: 
             return [year_token(s)]
 
-        ## Sea & Ep 
+        ## season & episode 
         season_pattern = re.compile(r'(season|s)\s*[0-9]{1,3}',flags=re.IGNORECASE) 
         episode_pattern = re.compile(r'(episode|e|part)\s*[0-9]{1,3}',flags=re.IGNORECASE)
-        
         number_pattern = re.compile('[0-9]{1,3}')
         
         season_episode = []
@@ -91,17 +92,13 @@ class tokeniser(object):
             season_episode.append(episode_token())
             season_episode.append(domain_number_token(int(number_pattern.search(episode_match.group()).group())))
             
-        if season_match or episode_match:
+        if season_episode:
             return season_episode
 
         # A domain number should only be an episode, season or sequel number. 
         if len(s) <= 3 and s.isdecimal() and int(s) <= 370: # one episode per day for year plus a few extra. 
 ## TODO Simple roman numerals. I, II, III, IV, V, VI. Convert to number values              
             return [domain_number_token(str(int(s)))]  
-        
-        # file ext. will only look for std ext used on the Fatboy Home Network (tm) because the any media we're processes has already been converted, hence is one of the know types 
-        if len(s) == 3 and (s.lower() == 'jpg' or s.lower() == 'mp4' or s.lower() == 'mp3' or s.lower() == 'txt'):
-            return [ext_token(s)]
 
         # anything else is a string
         if len (s) > 0:
@@ -231,8 +228,7 @@ class parser(object):
                 title_str += e.as_string().strip() + ' ' 
                 rtn.remove(e) # eat strings
             elif isinstance(e, year_token) or isinstance (e, season_token) or isinstance(e, episode_token) or isinstance(e, ext_token):
-                title = title_token(title_str.strip())
-                rtn.insert(0, title) # insert strings as title
+                rtn.insert(0, title_token(title_str.strip())) # insert strings as title
                 return rtn
         
         title = title_token(title_str.strip())
@@ -264,10 +260,35 @@ class parser(object):
         
         return rtn
 
+    def extract_extension(src_string):
+        
+        ext = os.path.splitext(src_string)[1]
+        
+        if ext:
+            return ext[1:]
+        else:
+            return  None
+
+    def extract_media_string(src_string):
+        
+        ext = os.path.splitext(src_string)[1]
+        
+        if ext:
+            return src_string[0:len(src_string)-len(ext)]
+        else:
+            return src_string 
 
     def parse(src_string):
-
-        elements = tokeniser.tokenise(src_string)
+        
+        extension_token = None
+        ext = parser.extract_extension(src_string)
+        
+        if ext:
+            extension_token = ext_token(ext)
+        
+        media_string = parser.extract_media_string(src_string)
+        
+        elements = tokeniser.tokenise(media_string)
         
         ## adding domain numbers to season_episode tokens 
         season_episode = parser.parse_season_episode_numbers(elements)
@@ -277,6 +298,8 @@ class parser(object):
         
         strings_to_title_one = parser.parse_strings_to_title_one(season_episode_tokens_to_string)
         strings_to_title_two = parser.parse_strings_to_title_two(strings_to_title_one)
+        
+        strings_to_title_two.append(extension_token)
         
         return strings_to_title_two
         
