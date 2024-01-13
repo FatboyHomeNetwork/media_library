@@ -563,6 +563,21 @@ class episode(abstract_media_item):
 #
 ################################################################################################
 
+# Developer stub 
+class normaliser_DEV(object):
+    
+    def __init__(self, model):
+        self.__model = model
+    
+    def normalise(self):
+        new_model = []
+        
+        for s in self.__model:
+            new_model.append(s + '-test')
+        self.__model = new_model
+        
+        return self.__model
+
 class normaliser(object):
     
     def __init__(self, model):
@@ -631,7 +646,7 @@ def create_path_model(working, media_name):
     if os.path.exists(media_path) and os.path.isdir(media_path):
         for subdir, dirs, files in os.walk(media_path):
             for f in files:
-                p =  os.path.join(subdir, f).replace(working,'')
+                p =  os.path.join(subdir, f).replace((working + '\\'),'')
                 path_model.append(p)
     
     return path_model

@@ -22,18 +22,18 @@ def clear_queue():
     
 def test__queue_next():    
 
-    mgn.queue_next(r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_media_library\__test_data\five')
-    mgn.queue_next(r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_media_library\__test_data\one')
-    mgn.queue_next(r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_media_library\__test_data\empty_bitmap_file.bmp')
-    mgn.queue_next(r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_media_library\__test_data\six')
-
-def test__import_next():
+    # mgn.queue(r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_media_library\__test_data\five')
+    # mgn.queue(r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_media_library\__test_data\one')
+    # mgn.queue(r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_media_library\__test_data\empty_bitmap_file.bmp')
+    # mgn.queue(r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_media_library\__test_data\six')
     
-    mgn.import_next()
-    mgn.import_next()
-    mgn.import_next()
-    mgn.import_next()
+    mgn.queue(r'\\SERVER\Users\Paul\Documents\Projects\FBHN_SW\media_library\test_media_library\__test_data\series name (1988)')
+    
 
+def test__import():
+    
+    mgn.import_item()
+    
 ################################################################################################
 #
 #  Test Entry Point
@@ -44,4 +44,4 @@ if __name__ == "__main__":
     
     clear_queue()
     test__queue_next()
-    test__import_next()                                      
+    test__import()                                      

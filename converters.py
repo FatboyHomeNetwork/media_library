@@ -13,43 +13,7 @@ MAX_PATH_LENGTH = 254
 
 ################################################################################################
 #
-#  path_converter__PROD
-#
-################################################################################################
-
-class path_converter__PROD(object):
-    
-    __path = ''
-    
-    def __init__(self, path):
-        self.__path = path
-        
-    def is_unc_path(self):
-        # see: file path formats on windows systems.pdf 
-        
-        if len(self.__path) > 3 and self.__path[0:2] == r'\\' and self.__path[2:3] != '?' and self.__path[2:3] != '.':
-            return True 
-        else:
-            return False
-
-    def adminshare(self):
-        # C:\Dir\subDir\etc. -> \\<machine name>\C$\Dir\subDir\etc. 
-        
-        if  not self.is_unc_path(): # eg, is C:\Dir\subDir\etc 
-            return  r'\\' +  platform.node() + r'\' + self.__path.replace(':','$',1)
-        else: 
-            raise Exception('Cannot convert UNC to admin share format.')
-    
-    def unc(self):
-        
-        if self.is_unc_path(): 
-            return self.__path
-        else: # is a drive letter than can map to a unc share, will throw exception if it can't be converted
-            return win32wnet.WNetGetUniversalName(self.__path, 1)  
-
-################################################################################################
-#
-#  path_converter__DEV -- dev sub to used to replace server context with local context 
+#  path_converter
 #
 ################################################################################################
 
@@ -68,6 +32,40 @@ class path_converter__DEV(object):
     
     def unc(self):
         return self.__path
+
+
+class path_converter(object):
+    
+    __path = ''
+    
+    def __init__(self, path):
+        self.__path = path
+        
+    def is_unc_path(self):
+        # see: file path formats on windows systems.pdf 
+        
+        if len(self.__path) > 3 and self.__path[0:2] == r'\\' and self.__path[2:3] != '?' and self.__path[2:3] != '.':
+            return True 
+        else:
+            return False
+
+    def adminshare(self):
+        # C:\Dir\subDir\etc. -> \\<machine name>\C$\Dir\subDir\etc. 
+        
+        if  not self.is_unc_path(): # eg, is C:\Dir\subDir\etc 
+        ##   return  r'\\' +  platform.node() + r'\' + self.__path.replace(r':','$',1)
+            return "adminshare() not working"
+        else: 
+            raise Exception('Cannot convert UNC to admin share format.')
+    
+    def unc(self):
+        
+        if self.is_unc_path(): 
+            return self.__path
+        else: # is a drive letter than can map to a unc share, will throw exception if it can't be converted
+            return win32wnet.WNetGetUniversalName(self.__path, 1)  
+
+
 
 
 ################################################################################################
@@ -164,6 +162,21 @@ class mime_type(object):
     
     NOT_SUPPORTED = 99
 
+
+# Dev/test stub for a media item 
+class media_converter__DEV:
+
+    def __init__(self, media_path):
+        self.__media_path = media_path
+        self.TYPES = mime_type()
+    
+    def mime_type(self):
+        return mime_type().VIDEO
+    
+    def convert(self):
+        return mime_type().VIDEO
+
+
 class media_converter:
 
     def __init__(self, media_path):
@@ -258,19 +271,14 @@ class media_converter:
             for file in files:
                                 
                 src = os.path.join(subdir, file)
-                type = self.__get_mime_type(file)
+                type = self.__get_mime_type(src)
                 
                 if type in [self.TYPES.IMAGE, self.TYPES.VIDEO, self.TYPES.AUDIO, self.TYPES.TEXT]: 
                     dst = self.__set_destination_ext(type, src)
                     
                     if os.path.splitext(src)[1] != os.path.splitext(dst)[1]:
                         ff = ffmpy.FFmpeg(executable=FFMPEG_PATH, inputs={src: None}, outputs={dst: '-y'})
-                        #ff.run()
-                        
-                        ## Dev hack 
-                        print ('** shutil.copy(src, dst) **')
-                        shutil.copy(src, dst)
-                        
+                        ff.run()
                         os.remove(src)
                 else:
                     os.remove(src)
